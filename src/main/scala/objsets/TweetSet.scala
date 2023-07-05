@@ -41,7 +41,7 @@ abstract class TweetSet extends TweetSetInterface:
    * and be implemented in the subclasses?
    */
   def filter(p: Tweet => Boolean): TweetSet =
-    filterAcc(p, this)
+    filterAcc(p, new Empty)
 
   /**
    * This is a helper method for `filter` that propagates the accumulated tweets.
@@ -123,9 +123,11 @@ class Empty extends TweetSet:
 
 class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet:
 
-  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = ???
-
-
+  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet =
+    if p(elem) then
+      left.filterAcc(p, right.filterAcc(p, acc.incl(elem)))
+    else
+      left.filterAcc(p, right.filterAcc(p, acc))
 
   /**
    * The following methods are already implemented
