@@ -76,7 +76,7 @@ abstract class TweetSet extends TweetSetInterface:
    * Question: Should we implement this method here, or should it remain abstract
    * and be implemented in the subclasses?
    */
-  def descendingByRetweet: TweetList = ???
+  def descendingByRetweet: TweetList
 
   /**
    * The following methods are already implemented
@@ -105,6 +105,8 @@ abstract class TweetSet extends TweetSetInterface:
    */
   def foreach(f: Tweet => Unit): Unit
 
+  def isEmpty: Boolean = false
+
 class Empty extends TweetSet:
   def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet =
     acc
@@ -113,6 +115,10 @@ class Empty extends TweetSet:
 
   def mostRetweeted: Tweet =
     throw new NoSuchElementException()
+
+  def descendingByRetweet: TweetList =
+    Nil
+
 
   /**
    * The following methods are already implemented
@@ -137,8 +143,20 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet:
   def union(that: TweetSet): TweetSet =
     left.union(right).union(that).incl(elem)
 
-  def mostRetweeted: Tweet = ???
+  def mostRetweeted: Tweet =
+    def maxNumberOfRetweet(t1: Tweet, t2: Tweet): Tweet =
+      if t1.retweets > t2.retweets then
+        t1
+      else
+        t2
+    if right.isEmpty then
+      maxNumberOfRetweet(left.mostRetweeted, elem)
+    else if left.isEmpty then
+      maxNumberOfRetweet(right.mostRetweeted, elem)
+    else
+      maxNumberOfRetweet(left.mostRetweeted, maxNumberOfRetweet(left.mostRetweeted, elem))
 
+  def descendingByRetweet: TweetList = ???
 
 
   /**
