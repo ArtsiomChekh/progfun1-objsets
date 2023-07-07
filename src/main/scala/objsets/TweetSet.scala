@@ -105,11 +105,13 @@ abstract class TweetSet extends TweetSetInterface:
    */
   def foreach(f: Tweet => Unit): Unit
 
-  def isEmpty: Boolean = false
+  def isEmpty: Boolean
 
 class Empty extends TweetSet:
   def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet =
     acc
+
+  def isEmpty = true
 
   def union(that: TweetSet): TweetSet = that
 
@@ -118,7 +120,6 @@ class Empty extends TweetSet:
 
   def descendingByRetweet: TweetList =
     Nil
-
 
   /**
    * The following methods are already implemented
@@ -143,21 +144,20 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet:
   def union(that: TweetSet): TweetSet =
     left.union(right).union(that).incl(elem)
 
+  def isEmpty = false
+
   def mostRetweeted: Tweet =
-    def maxNumberOfRetweet(t1: Tweet, t2: Tweet): Tweet =
-      if t1.retweets > t2.retweets then
-        t1
-      else
-        t2
-    if right.isEmpty then
-      maxNumberOfRetweet(left.mostRetweeted, elem)
-    else if left.isEmpty then
-      maxNumberOfRetweet(right.mostRetweeted, elem)
-    else
-      maxNumberOfRetweet(left.mostRetweeted, maxNumberOfRetweet(left.mostRetweeted, elem))
+    def maxRet(a: Tweet, b: Tweet): Tweet =
+      if a.retweets > b.retweets then a else b
 
-  def descendingByRetweet: TweetList = ???
+    if left.isEmpty && right.isEmpty then elem
+    else if left.isEmpty then maxRet(elem, right.mostRetweeted)
+    else if right.isEmpty then maxRet(elem, left.mostRetweeted)
+    else maxRet(maxRet(left.mostRetweeted, right.mostRetweeted), elem)
 
+  def descendingByRetweet: TweetList =
+    val maxRet = mostRetweeted
+    new Cons(maxRet, remove(maxRet).descendingByRetweet)
 
   /**
    * The following methods are already implemented
