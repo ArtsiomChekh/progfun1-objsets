@@ -43,7 +43,7 @@ class TweetSetSuite extends munit.FunSuite:
       assertEquals(size(set5.union(set1)), 4)
   }
 
-  test("union: with empty set2") {
+  test("union: with empty set") {
     new TestSets:
       assertEquals(size(set1.union(set5)), 4)
   }
