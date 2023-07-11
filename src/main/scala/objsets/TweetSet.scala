@@ -41,7 +41,7 @@ abstract class TweetSet extends TweetSetInterface:
    * and be implemented in the subclasses?
    */
   def filter(p: Tweet => Boolean): TweetSet =
-    filterAcc(p, new Empty)
+    filterAcc(p, Empty())
 
   /**
    * This is a helper method for `filter` that propagates the accumulated tweets.
@@ -116,7 +116,7 @@ class Empty extends TweetSet:
   def union(that: TweetSet): TweetSet = that
 
   def mostRetweeted: Tweet =
-    throw new NoSuchElementException()
+    throw java.util.NoSuchElementException()
 
   def descendingByRetweet: TweetList =
     Nil
@@ -146,14 +146,22 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet:
 
   def isEmpty = false
 
-  def mostRetweeted: Tweet =
-    def maxRet(a: Tweet, b: Tweet): Tweet =
-      if a.retweets > b.retweets then a else b
+  //    def mostRetweeted: Tweet =
+  //      def maxRet(a: Tweet, b: Tweet): Tweet =
+  //        if a.retweets > b.retweets then a else b
+  //
+  //      if left.isEmpty && right.isEmpty then elem
+  //      else if left.isEmpty then maxRet(elem, right.mostRetweeted)
+  //      else if right.isEmpty then maxRet(elem, left.mostRetweeted)
+  //      else maxRet(maxRet(left.mostRetweeted, right.mostRetweeted), elem)
 
-    if left.isEmpty && right.isEmpty then elem
-    else if left.isEmpty then maxRet(elem, right.mostRetweeted)
-    else if right.isEmpty then maxRet(elem, left.mostRetweeted)
-    else maxRet(maxRet(left.mostRetweeted, right.mostRetweeted), elem)
+  def mostRetweeted: Tweet =
+    var maxTweet: Tweet = null
+    foreach(tweet =>
+      if maxTweet == null || tweet.retweets > maxTweet.retweets then
+        maxTweet = tweet
+    )
+    maxTweet
 
   def descendingByRetweet: TweetList =
     val maxRet = mostRetweeted
