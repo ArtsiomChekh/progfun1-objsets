@@ -147,13 +147,12 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet:
   def isEmpty = false
 
   def mostRetweeted: Tweet =
-    var most: Tweet = null
+    var most: Tweet = elem
     foreach(tweet =>
-      if most == null || tweet.retweets > most.retweets then
+      if tweet.retweets > most.retweets then
         most = tweet
     )
     most
-
 
   def descendingByRetweet: TweetList =
     val maxRet = mostRetweeted
